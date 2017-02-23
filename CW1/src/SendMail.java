@@ -3,7 +3,11 @@
  */
 public class SendMail {
 
-    @Override
-    public String toString() {
+    public void composeGmail(String to, String from, String sub, String msg) {
+
+    }
+
+    public void composeExMail(String to, String from, String sub, String msg) {
+
     }
 }
