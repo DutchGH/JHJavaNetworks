@@ -1,0 +1,9 @@
+/**
+ * Created by jake on 23/02/2017.
+ */
+public class SendMail {
+
+    @Override
+    public String toString() {
+    }
+}
