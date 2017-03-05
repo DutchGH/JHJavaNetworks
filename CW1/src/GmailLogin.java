@@ -7,6 +7,14 @@ import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.util.Properties;
+import javax.mail.Folder;
+import javax.mail.Store;
+import javax.mail.MessagingException;  
+import javax.mail.NoSuchProviderException;
+import java.io.IOException;
+import javax.mail.imap;
+
+
 
 /**
  * Created by jake on 23/02/2017.
@@ -17,7 +25,7 @@ public class GmailLogin extends Login{
     private final String password;
     protected Session userSession;
     private Properties sendProp;
-    private Properties recProp;
+    //private Properties recProp;
 
     public GmailLogin(String un, String pw) {
         username = un;
@@ -47,21 +55,47 @@ public class GmailLogin extends Login{
         return this.sendProp;
     }
 
-    public Properties setRecProp() {
-        String host = "imap.gmail.com";
-        String username = this.username;
-        String password = this.password;
-        Properties props = new Properties();
-        props.setProperty("mail.imap.ssl.enable", "true");
-        // set any other needed mail.imap.* properties here
-        Session session = Session.getInstance(props);
-        Store store = session.getStore("imap");
-        store.connect(host, username, password);
-        return props;
-    }
+    public void readMail() {
+        try {
+            String host = "imap.gmail.com";
+            String username = this.username;
+            String password = this.password;
+            Properties props = new Properties();
+            props.setProperty("mail.imap.ssl.enable", "true");
+            props.setProperty("mail.imap.host", host);
+            props.setProperty("mail.imap.port", "993");
+            Session session = Session.getInstance(props);
+            Store store = session.getStore("imap");
+            store.connect(host, username, password);
+            Folder emailFolder = store.getFolder("INBOX");  
+            emailFolder.open(Folder.READ_ONLY);  
 
-    public Properties getRecProp() {
-        return this.recProp;
+            //4) retrieve the messages from the folder in an array and print it  
+            Message[] messages = emailFolder.getMessages();  
+            for (int i = 0; i < 10; i++) {  
+                Message message = messages[i];  
+                System.out.println("---------------------------------");  
+                System.out.println("Email Number " + (i + 1));  
+                System.out.println("Subject: " + message.getSubject());  
+                System.out.println("From: " + message.getFrom()[0]);  
+                System.out.println("Text: " + message.getContent().toString());  
+            }  
+
+            //5) close the store and folder objects  
+            emailFolder.close(false);  
+            store.close();
+        } 
+        catch (NoSuchProviderException e) {e.printStackTrace();}   
+        catch (MessagingException e) {e.printStackTrace();}  
+        catch (IOException e) {e.printStackTrace();}
+    }  
+
+    // public Properties getRecProp() {
+    //     return this.recProp;
+    // }
+
+    public void viewMail() {
+        
     }
 
 

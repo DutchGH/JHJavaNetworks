@@ -31,7 +31,7 @@ public class GmailApp {
             String input = command.toLowerCase();
             switch (input) {
                 case "read":
-                    //acc.readMail();
+                    acc.readMail();
                     break;
                 case "send":
                     System.out.println("Who would You like to send the email to?");
@@ -43,8 +43,6 @@ public class GmailApp {
 
                     SendMail mail = new SendMail(to, acc.getUserName(), sub, msg);
                     mail.send(acc.getSession());
-
-                    //acc.sendMail();
                     break;
                 case "exit":
                     System.out.println("Have A Nice Day!");
