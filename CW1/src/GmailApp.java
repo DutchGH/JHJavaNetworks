@@ -11,6 +11,7 @@ public class GmailApp {
         Boolean running = true;
         Boolean endProg = false;
         Console console = System.console();
+        
         System.out.println("========== GMAIL APPLICATION ==========");
         System.out.println("========== JACOB HOLLAND - SC15J3H ==========");
 
@@ -31,18 +32,13 @@ public class GmailApp {
             String input = command.toLowerCase();
             switch (input) {
                 case "read":
-                    acc.readMail();
+                    CheckMail inbox = new CheckMail();
+                    inbox.readMail(acc.getUserName(), new String(paswd));
                     break;
                 case "send":
-                    System.out.println("Who would You like to send the email to?");
-                    String to = console.readLine("[%s] ", "To");
-                    System.out.println("What is the Subject?");
-                    String sub = console.readLine("[%s] ", "Subject");
-                    System.out.println("What would you like to say?");
-                    String msg = console.readLine("[%s] ", "Message");
-
-                    SendMail mail = new SendMail(to, acc.getUserName(), sub, msg);
-                    mail.send(acc.getSession());
+                    SendMail mail = new SendMail(acc.getUserName(), new String(paswd));
+                    mail.compose(console);
+                    mail.send();
                     break;
                 case "exit":
                     System.out.println("Have A Nice Day!");
