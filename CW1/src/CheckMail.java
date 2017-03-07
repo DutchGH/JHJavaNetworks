@@ -17,6 +17,10 @@ import javax.mail.MessagingException;
 import javax.mail.NoSuchProviderException;
 import java.io.IOException;
 public class CheckMail {
+
+        /* Returns a list of emails sent to the user address.
+        It sets up a new IMAP connection and stores the inboxeds messages in
+        a Message Array*/
         public void readMail(String un, String pw) {
         try {
             String host = "imap.gmail.com";
@@ -32,24 +36,23 @@ public class CheckMail {
             Folder emailFolder = store.getFolder("INBOX");  
             emailFolder.open(Folder.READ_ONLY);  
 
-            //4) retrieve the messages from the folder in an array and print it  
+            //retrieve the messages from the folder in an array and print it  
             Message[] messages = emailFolder.getMessages();  
-            for (int i = 0; i < 10; i++) {  
+            for (int i = 0; i < 150; i++) {  
                 Message message = messages[i];  
                 System.out.println("---------------------------------");  
                 System.out.println("Email Number " + (i + 1));  
                 System.out.println("Subject: " + message.getSubject());  
                 System.out.println("From: " + message.getFrom()[0]);  
-                System.out.println("Text: " + message.getContent().toString());  
+                //System.out.println("Text: " + message.getContent().toString());  
             }  
 
-            //5) close the store and folder objects  
             emailFolder.close(false);  
             store.close();
         } 
+        //catch (IOException e) {e.printStackTrace();}
         catch (NoSuchProviderException e) {e.printStackTrace();}   
         catch (MessagingException e) {e.printStackTrace();}  
-        catch (IOException e) {e.printStackTrace();}
     }  
 
 }

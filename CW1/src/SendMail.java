@@ -20,7 +20,7 @@ private String subject;
 private Session userSession;
 private Properties sendProperties;
 
-  
+    //Constuct a new class with empty strings, which can be filled by set methods
     public SendMail(String un, String pw) {
         sendProperties = setSendProp();
         userSession = setSession(un, pw);
@@ -30,6 +30,7 @@ private Properties sendProperties;
         subject = "";
     }
 
+    //Create new Session for SMTP
     public Session setSession(String un, String pw) {
     return Session.getInstance(this.getSendProp(), new javax.mail.Authenticator() {
         protected PasswordAuthentication getPasswordAuthentication() {
@@ -90,16 +91,17 @@ private Properties sendProperties;
         return gSend;
     }
 
-        public Properties getSendProp() {
+    //Returns SMTP Properties
+    public Properties getSendProp() {
         return this.sendProperties;
     }
 
-
-
-
+    //Returns the user session
     public Session getSession() {
         return this.userSession;
     }
+
+    //Provides a console interface for setting message qualities
     public void compose(Console console){
 
         System.out.println("Who would You like to send the email to?");

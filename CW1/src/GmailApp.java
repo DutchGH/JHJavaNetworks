@@ -7,14 +7,16 @@ import java.net.Authenticator;
 
 
 public class GmailApp {
-    public static void main(String[] args) throws Exception{
+
+    public static void main(String[] args) throws Exception {
+
         Boolean running = true;
-        Boolean endProg = false;
         Console console = System.console();
         
         System.out.println("========== GMAIL APPLICATION ==========");
         System.out.println("========== JACOB HOLLAND - SC15J3H ==========");
 
+        //Get UN and PW from console input securely
         String user = console.readLine("[%s] ", "Username");
         char[] paswd = console.readPassword("[%s] ", "Password");
 
@@ -23,6 +25,7 @@ public class GmailApp {
             System.exit(0);
         }
 
+        //make a new login
         GmailLogin acc = new GmailLogin(user, new String(paswd));
 
         while (running) {
