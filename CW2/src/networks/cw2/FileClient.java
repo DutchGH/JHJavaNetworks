@@ -29,7 +29,7 @@ public class FileClient {
     }
 
     public static void main(String[] args) {
-        FileClient client = new FileClient("127,0,0,1", 5000);
+        FileClient client = new FileClient("127.0.0.1", 4444);
         client.talkToServer();
     }
 
@@ -37,7 +37,21 @@ public class FileClient {
         String message;
 
         Thread readerThread = new Thread(new IncomingReader());
-        System.out.println("client typed:" + message);
-        socketOut.println(message);
+        readerThread.start();
+
+        while ((message = keyboardIn.nextLine()) != null) {
+            System.out.println("client typed: " + message);
+            socketOut.println(message);
+        }
     }
+
+    private class IncomingReader implements Runnable {
+        public void run() {
+            String message;
+            while ((message = socketIn.nextLine()) != null) {
+                System.out.println("Client Read:" + message);
+            }
+        }
+    }
+
 }

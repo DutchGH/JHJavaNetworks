@@ -25,13 +25,22 @@ public class ClientHandler extends Observable implements Runnable {
         }
     }
 
+    public void send(String message) {
+        writer.println(message);
+    }
+
 
     public void run() {
         String message;
         while ((message = reader.nextLine()) != null) {
-            System.out.println("clientHandler read" + message);
+            if (message.contains("LIST")) {
+                System.out.println("LIST OF FOLDERS");
+                setChanged();
+                notifyObservers("LIST OF FOLDERS");
+            }
+            System.out.println("Client Handler Read: " + message);
             setChanged();
-            notifyObservers();
+            notifyObservers(message);
         }
     }
 
