@@ -47,6 +47,7 @@ public class FileServer implements Observer {
 
     }
 
+
     public void update(Observable client, Object msg) {
         tellEveryone("from server - " + msg);
     }

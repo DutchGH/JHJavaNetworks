@@ -40,16 +40,17 @@ public class FileClient {
         readerThread.start();
 
         while ((message = keyboardIn.nextLine()) != null) {
-            System.out.println("client typed: " + message);
+            //System.out.println("client typed: " + message);
             socketOut.println(message);
         }
     }
+
 
     private class IncomingReader implements Runnable {
         public void run() {
             String message;
             while ((message = socketIn.nextLine()) != null) {
-                System.out.println("Client Read:" + message);
+                System.out.println(message);
             }
         }
     }

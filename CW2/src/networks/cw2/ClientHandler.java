@@ -1,9 +1,12 @@
 package networks.cw2;
 
 
+import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.Arrays;
 import java.util.Observable;
 import java.util.Scanner;
 
@@ -30,17 +33,33 @@ public class ClientHandler extends Observable implements Runnable {
     }
 
 
+    public String listDirectories() {
+        File file = new File("src\\serverPublic");
+        String[] directories = file.list(new FilenameFilter() {
+            @Override
+            public boolean accept(File current, String name) {
+                return new File(current, name).isDirectory();
+            }
+        });
+        return Arrays.toString(directories);
+    }
+
     public void run() {
+        send("Hi There! What would you like to do?");
+        send("Would you like to LIST, DOWNLOAD or EXIT?");
+        send("Enter Command Here: ");
         String message;
         while ((message = reader.nextLine()) != null) {
             if (message.contains("LIST")) {
-                System.out.println("LIST OF FOLDERS");
-                setChanged();
-                notifyObservers("LIST OF FOLDERS");
+                send("Folders Available:" + listDirectories());
             }
-            System.out.println("Client Handler Read: " + message);
-            setChanged();
-            notifyObservers(message);
+            if (message.contains("DOWNLOAD")) {
+                send("Download Mode");
+                send("Type the Name of The Folder You Want");
+            }
+            //System.out.println("Client Handler Read: " + message);
+            //setChanged();
+            //notifyObservers(message);
         }
     }
 
