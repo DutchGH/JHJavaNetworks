@@ -7,14 +7,13 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Arrays;
-import java.util.Observable;
 import java.util.Scanner;
 
 /**
  * Client Handler - Jacob Holland
  * This class will manage the thread pool via the executor class
  */
-public class ClientHandler extends Observable implements Runnable {
+public class ClientHandler implements Runnable {
 
     private Scanner reader = null;
     private PrintWriter writer = null;
@@ -44,16 +43,20 @@ public class ClientHandler extends Observable implements Runnable {
         return Arrays.toString(directories);
     }
 
+    public void sendFile(String directory) {
+
+    }
+
     public void run() {
         send("Hi There! What would you like to do?");
         send("Would you like to LIST, DOWNLOAD or EXIT?");
         send("Enter Command Here: ");
         String message;
         while ((message = reader.nextLine()) != null) {
-            if (message.contains("LIST")) {
+            if (message.toLowerCase().contains("list")) {
                 send("Folders Available:" + listDirectories());
             }
-            if (message.contains("DOWNLOAD")) {
+            if (message.toLowerCase().contains("download")) {
                 send("Download Mode");
                 send("Type the Name of The Folder You Want");
             }
