@@ -45,12 +45,22 @@ public class FileClient {
         }
     }
 
+    public void downloadFolder(String folderName) {
+
+    }
+
+    public void downloadFile(String fileToRecieve) {
+
+    }
 
     private class IncomingReader implements Runnable {
         public void run() {
             String message;
             while ((message = socketIn.nextLine()) != null) {
                 System.out.println(message);
+                if (message.toLowerCase().contains("download")) {
+                    downloadFolder(socketIn.nextLine());
+                }
             }
         }
     }
