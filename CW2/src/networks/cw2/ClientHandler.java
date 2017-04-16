@@ -91,6 +91,12 @@ public class ClientHandler implements Runnable {
             if (message.toLowerCase().contains("download")) {
                 send("Download Mode");
                 send("Type the Name of The Folder You Want");
+                String folderToSearch = reader.nextLine();
+                if (listDirectories().contains(folderToSearch)) {
+                    send("src/" + folderToSearch);
+                } else {
+                    send("Sorry this directory does not exist");
+                }
             }
             //System.out.println("Client Handler Read: " + message);
             //setChanged();

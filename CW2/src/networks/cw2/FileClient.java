@@ -58,9 +58,9 @@ public class FileClient {
             String message;
             while ((message = socketIn.nextLine()) != null) {
                 System.out.println(message);
-                if (message.toLowerCase().contains("download")) {
-                    downloadFolder(socketIn.nextLine());
-                }
+//                if(message.toLowerCase().contains("download")) {
+//
+//                }
             }
         }
     }
