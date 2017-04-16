@@ -31,22 +31,6 @@ public class FileServer {
     public static void main(String[] args) {
         FileServer server = new FileServer(4444);
     }
-//
-//    public void tellEveryone(String message) {
-//        Iterator it = clients.iterator();
-//
-//        while (it.hasNext()) {
-//            ClientHandler client = (ClientHandler) it.next();
-//            client.send(message);
-//        }
-//        System.out.println(message);
-//
-//    }
-
-
-//    public void update(Observable client, Object msg) {
-//        tellEveryone("from server - " + msg);
-//    }
 
     public class ServerLoop implements Runnable {
         public void run() {
@@ -57,8 +41,6 @@ public class FileServer {
                     Socket client = serverSocket.accept();
                     ClientHandler c = new ClientHandler(client);
                     service.execute(c);
-                    //clients.add(c);
-                    //c.addObserver(FileServer.this);
                     System.out.println("Connection Recieved From: " + client.getInetAddress());
                 }
 
@@ -67,6 +49,7 @@ public class FileServer {
             }
         }
     }
+
 
 }
 

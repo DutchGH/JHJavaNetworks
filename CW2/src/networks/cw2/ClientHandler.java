@@ -4,7 +4,6 @@ package networks.cw2;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Arrays;
 import java.util.Scanner;
 
 /**
@@ -38,8 +37,13 @@ public class ClientHandler implements Runnable {
                 return new File(current, name).isDirectory();
             }
         });
-        return Arrays.toString(directories);
+        String folderList = String.format("Folders Available:\n");
+        for (int i = 0; i < directories.length; i++) {
+            folderList = folderList + String.format("%d. %s\n", i + 1, directories[i]);
+        }
+        return folderList;
     }
+
 
     public void sendFile(String fileToSend) throws IOException {
         FileInputStream fis = null;
@@ -80,23 +84,14 @@ public class ClientHandler implements Runnable {
     }
 
     public void run() {
-        send("Hi There! What would you like to do?");
-        send("Would you like to LIST, DOWNLOAD or EXIT?");
-        send("Enter Command Here: ");
+        //send("You have Connected.");
         String message;
         while ((message = reader.nextLine()) != null) {
-            if (message.toLowerCase().contains("list")) {
-                send("Folders Available:" + listDirectories());
+            if (message.contains("$LIST$")) {
+                send(listDirectories());
             }
-            if (message.toLowerCase().contains("download")) {
-                send("Download Mode");
-                send("Type the Name of The Folder You Want");
-                String folderToSearch = reader.nextLine();
-                if (listDirectories().contains(folderToSearch)) {
-                    send("src/" + folderToSearch);
-                } else {
-                    send("Sorry this directory does not exist");
-                }
+            if (message.contains("$DOWNLOAD$")) {
+                send("Opening Socket. Please Wait");
             }
             //System.out.println("Client Handler Read: " + message);
             //setChanged();

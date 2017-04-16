@@ -39,9 +39,24 @@ public class FileClient {
         Thread readerThread = new Thread(new IncomingReader());
         readerThread.start();
 
+        System.out.printf("What Would You Like To Do?\nLIST?\nDOWNLOAD?\nEXIT\nCommand: ");
         while ((message = keyboardIn.nextLine()) != null) {
+            if (message.toLowerCase().contains("list")) {
+                socketOut.println("$LIST$");
+                System.out.printf("What Would You Like To Do?\nLIST?\nDOWNLOAD?\nEXIT\nCommand: ");
+
+            } else if (message.toLowerCase().contains("download")) {
+                System.out.println("Name The Folder You Want To Download");
+                String folder = keyboardIn.nextLine();
+                socketOut.println("$DOWNLOAD$");
+            } else if (message.toLowerCase().contains("exit")) {
+                System.out.println("Have A Good Day!");
+            } else {
+                System.out.println("INVALID COMMAND. TRY AGAIN");
+                System.out.printf("What Would You Like To Do?\nLIST?\nDOWNLOAD?\nEXIT?Command: ");
+            }
             //System.out.println("client typed: " + message);
-            socketOut.println(message);
+            //socketOut.println(message);
         }
     }
 
@@ -58,9 +73,6 @@ public class FileClient {
             String message;
             while ((message = socketIn.nextLine()) != null) {
                 System.out.println(message);
-//                if(message.toLowerCase().contains("download")) {
-//
-//                }
             }
         }
     }
