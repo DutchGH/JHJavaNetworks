@@ -1,5 +1,6 @@
 package networks.cw2;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
@@ -43,20 +44,17 @@ public class FileClient {
         while ((message = keyboardIn.nextLine()) != null) {
             if (message.toLowerCase().contains("list")) {
                 socketOut.println("$LIST$");
-                System.out.printf("What Would You Like To Do?\nLIST?\nDOWNLOAD?\nEXIT\nCommand: ");
-
             } else if (message.toLowerCase().contains("download")) {
                 System.out.println("Name The Folder You Want To Download");
                 String folder = keyboardIn.nextLine();
                 socketOut.println("$DOWNLOAD$");
+                socketOut.println(folder);
             } else if (message.toLowerCase().contains("exit")) {
                 System.out.println("Have A Good Day!");
             } else {
                 System.out.println("INVALID COMMAND. TRY AGAIN");
                 System.out.printf("What Would You Like To Do?\nLIST?\nDOWNLOAD?\nEXIT?Command: ");
             }
-            //System.out.println("client typed: " + message);
-            //socketOut.println(message);
         }
     }
 
@@ -68,11 +66,41 @@ public class FileClient {
 
     }
 
+    public void createFolder(String folderName) {
+        File path = new File("download/" + folderName + "/");
+        boolean result = path.exists();
+        if (!result){
+            result = path.mkdirs();
+        }
+        else {
+
+        }
+    }
+
+
+
+//    public class FileReciever {
+//        public FileReciever() {
+//
+//        }
+//    }
+
     private class IncomingReader implements Runnable {
         public void run() {
             String message;
+            String folder;
             while ((message = socketIn.nextLine()) != null) {
-                System.out.println(message);
+                if (message.contains("$DOWNLOAD$")) {
+                    System.out.println("Connecting To Server");
+                    //folder = socketIn.nextLine();
+                    if((socketIn.nextLine().contains("$CREATE$"))) {
+                        createFolder(socketIn.nextLine());
+                    }
+                }
+
+                else {
+                    System.out.println(message);
+                }
             }
         }
     }

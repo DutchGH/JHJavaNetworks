@@ -44,6 +44,29 @@ public class ClientHandler implements Runnable {
         return folderList;
     }
 
+    public boolean folderExists(String folder){
+        boolean result = new File("src/serverPublic/" + folder).exists();
+        return result;
+    }
+
+    public void listFiles(String fol) {
+        File folder = new File("src/serverPublic/" + fol);
+        File[] listOfFiles = folder.listFiles();
+
+        for (int i = 0; i < listOfFiles.length; i++) {
+            if (listOfFiles[i].isFile()) {
+                try {
+                    sendFile("src/serverPublic/fol" + listOfFiles[i].getName());
+                }
+                catch (IOException ioe) {
+                    ioe.printStackTrace();
+                }
+            } else if (listOfFiles[i].isDirectory()) {
+                send("Directory " + listOfFiles[i].getName());
+            }
+        }
+    }
+
 
     public void sendFile(String fileToSend) throws IOException {
         FileInputStream fis = null;
@@ -91,7 +114,14 @@ public class ClientHandler implements Runnable {
                 send(listDirectories());
             }
             if (message.contains("$DOWNLOAD$")) {
-                send("Opening Socket. Please Wait");
+                String folder = reader.nextLine();
+                //send(folder);
+                if (folderExists(folder)) {
+                    send("$CREATE$");
+                }
+                else {
+                    send("Folder Does Not Exist On The Server");
+                }
             }
             //System.out.println("Client Handler Read: " + message);
             //setChanged();
