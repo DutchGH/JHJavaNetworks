@@ -1,8 +1,6 @@
 package networks.cw2;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
 import java.util.Scanner;
 
@@ -14,6 +12,9 @@ import java.util.Scanner;
 
 public class FileClient {
 
+    private static String HOST_ADDRESS = "127.0.0.1";
+    private static int MAIN_PORT = 4444;
+    private static int FILE_PORT = 4455;
     private Scanner socketIn = null;
     private PrintWriter socketOut = null;
     private Scanner keyboardIn = null;
@@ -30,7 +31,7 @@ public class FileClient {
     }
 
     public static void main(String[] args) {
-        FileClient client = new FileClient("127.0.0.1", 4444);
+        FileClient client = new FileClient(HOST_ADDRESS, MAIN_PORT);
         client.talkToServer();
     }
 
@@ -58,32 +59,44 @@ public class FileClient {
         }
     }
 
-    public void downloadFolder(String folderName) {
 
-    }
+    public void downloadFiles() throws IOException {
+        try {
 
-    public void downloadFile(String fileToRecieve) {
+            Socket socket = new Socket(HOST_ADDRESS, FILE_PORT);
 
-    }
+            BufferedInputStream bis = new BufferedInputStream(socket.getInputStream());
+            DataInputStream dis = new DataInputStream(bis);
 
-    public void createFolder(String folderName) {
-        File path = new File("download/" + folderName + "/");
-        boolean result = path.exists();
-        if (!result){
-            result = path.mkdirs();
+            int filesCount = dis.readInt();
+            File[] files = new File[filesCount];
+            String dirPath = "./" + dis.readUTF();
+
+            for (int i = 0; i < filesCount; i++) {
+                long fileLength = dis.readLong();
+                String fileName = dis.readUTF();
+
+                files[i] = new File(dirPath + "/" + fileName);
+
+                FileOutputStream fos = new FileOutputStream(files[i]);
+                BufferedOutputStream bos = new BufferedOutputStream(fos);
+
+                for (int j = 0; j < fileLength; j++) {
+                    bos.write(bis.read());
+                }
+
+                bos.close();
+            }
+
+            socket.close();
+            bis.close();
+            dis.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        else {
 
-        }
     }
 
-
-
-//    public class FileReciever {
-//        public FileReciever() {
-//
-//        }
-//    }
 
     private class IncomingReader implements Runnable {
         public void run() {
@@ -91,10 +104,10 @@ public class FileClient {
             String folder;
             while ((message = socketIn.nextLine()) != null) {
                 if (message.contains("$DOWNLOAD$")) {
-                    System.out.println("Connecting To Server");
-                    //folder = socketIn.nextLine();
-                    if((socketIn.nextLine().contains("$CREATE$"))) {
-                        createFolder(socketIn.nextLine());
+                    try {
+                        downloadFiles();
+                    } catch (IOException ioe) {
+                        ioe.printStackTrace();
                     }
                 }
 

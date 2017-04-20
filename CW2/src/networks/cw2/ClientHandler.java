@@ -11,7 +11,7 @@ import java.util.Scanner;
  * This class will manage the thread pool via the executor class
  */
 public class ClientHandler implements Runnable {
-
+    private static int FILE_PORT = 4455;
     private Scanner reader = null;
     private PrintWriter writer = null;
 
@@ -49,59 +49,43 @@ public class ClientHandler implements Runnable {
         return result;
     }
 
-    public void listFiles(String fol) {
-        File folder = new File("src/serverPublic/" + fol);
-        File[] listOfFiles = folder.listFiles();
 
-        for (int i = 0; i < listOfFiles.length; i++) {
-            if (listOfFiles[i].isFile()) {
-                try {
-                    sendFile("src/serverPublic/fol" + listOfFiles[i].getName());
-                }
-                catch (IOException ioe) {
-                    ioe.printStackTrace();
-                }
-            } else if (listOfFiles[i].isDirectory()) {
-                send("Directory " + listOfFiles[i].getName());
-            }
-        }
-    }
-
-
-    public void sendFile(String fileToSend) throws IOException {
-        FileInputStream fis = null;
-        BufferedInputStream bis = null;
-        OutputStream os = null;
-        ServerSocket servSock = null;
-        Socket sock = null;
-
+    public void sendFile(String directory) {
+        String serverLocation = "/src/serverPublic/" + directory;
         try {
-            servSock = new ServerSocket(8862);
+            ServerSocket serverSocket = new ServerSocket(FILE_PORT);
+
             while (true) {
-                System.out.println("Waiting For Connection");
-                try {
-                    sock = servSock.accept();
-                    System.out.println("Accepted Connection");
+                Socket socket = serverSocket.accept();
+                File[] files = new File(serverLocation).listFiles();
+                BufferedOutputStream bos = new BufferedOutputStream(socket.getOutputStream());
+                DataOutputStream dos = new DataOutputStream(bos);
 
-                    File myFile = new File(fileToSend);
-                    byte[] fileByteArray = new byte[(int) myFile.length()];
-                    fis = new FileInputStream(myFile);
-                    bis = new BufferedInputStream(fis);
+                dos.writeInt(files.length);
+                dos.writeUTF(directory);
 
-                    bis.read(fileByteArray, 0, fileByteArray.length);
-                    os = sock.getOutputStream();
-                    //System.out.println("Sending" + fileToSend)
-                    os.write(fileByteArray, 0, fileByteArray.length);
-                    os.flush();
-                    System.out.println("Done");
-                } finally {
-                    if (bis != null) bis.close();
-                    if (os != null) os.close();
-                    if (sock != null) sock.close();
+                for (File file : files) {
+                    long length = file.length();
+                    dos.writeLong(length);
+
+                    String name = file.getName();
+                    dos.writeUTF(name);
+
+                    FileInputStream fis = new FileInputStream(file);
+                    BufferedInputStream bis = new BufferedInputStream(fis);
+
+                    int fileByte = 0;
+                    while ((fileByte = bis.read()) != -1) {
+                        bos.write(fileByte);
+                    }
+
+                    bis.close();
                 }
+                dos.close();
+                serverSocket.close();
             }
-        } finally {
-            if (servSock != null) servSock.close();
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
         }
 
     }
@@ -115,12 +99,12 @@ public class ClientHandler implements Runnable {
             }
             if (message.contains("$DOWNLOAD$")) {
                 String folder = reader.nextLine();
-                //send(folder);
                 if (folderExists(folder)) {
-                    send("$CREATE$");
+                    sendFile(folder);
+                    send("$DOWNLOAD$");
                 }
                 else {
-                    send("Folder Does Not Exist On The Server");
+                    send("Folder Does Not Exist On The Server.");
                 }
             }
             //System.out.println("Client Handler Read: " + message);
