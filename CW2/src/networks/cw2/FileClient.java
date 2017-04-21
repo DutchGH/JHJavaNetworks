@@ -14,7 +14,7 @@ public class FileClient {
 
     private static String HOST_ADDRESS = "127.0.0.1";
     private static int MAIN_PORT = 4444;
-    private static int FILE_PORT = 4455;
+    private static int FILE_PORT = 8845;
     private Scanner socketIn = null;
     private PrintWriter socketOut = null;
     private Scanner keyboardIn = null;
@@ -70,27 +70,35 @@ public class FileClient {
 
             int filesCount = dis.readInt();
             File[] files = new File[filesCount];
-            String dirPath = "./" + dis.readUTF();
+            String dirPath = "src/clientDownload/" + dis.readUTF();
+            File folderVerification = new File(dirPath);
+            boolean wasSuccessful = folderVerification.mkdir();
+            if (!wasSuccessful) {
+                System.out.println("ERROR CREATING FOLDER");
+            } else {
+                for (int i = 0; i < filesCount; i++) {
+                    long fileLength = dis.readLong();
+                    String fileName = dis.readUTF();
 
-            for (int i = 0; i < filesCount; i++) {
-                long fileLength = dis.readLong();
-                String fileName = dis.readUTF();
+                    String targetFile = dirPath + "/" + fileName;
+                    System.out.println(targetFile);
+                    files[i] = new File(targetFile);
 
-                files[i] = new File(dirPath + "/" + fileName);
+                    FileOutputStream fos = new FileOutputStream(files[i]);
+                    BufferedOutputStream bos = new BufferedOutputStream(fos);
 
-                FileOutputStream fos = new FileOutputStream(files[i]);
-                BufferedOutputStream bos = new BufferedOutputStream(fos);
+                    for (int j = 0; j < fileLength; j++) {
+                        bos.write(bis.read());
+                    }
 
-                for (int j = 0; j < fileLength; j++) {
-                    bos.write(bis.read());
+
+                    bos.close();
                 }
 
-                bos.close();
+                socket.close();
+                bis.close();
+                dis.close();
             }
-
-            socket.close();
-            bis.close();
-            dis.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -101,10 +109,10 @@ public class FileClient {
     private class IncomingReader implements Runnable {
         public void run() {
             String message;
-            String folder;
             while ((message = socketIn.nextLine()) != null) {
                 if (message.contains("$DOWNLOAD$")) {
                     try {
+                        System.out.println("Attempting To Print Files");
                         downloadFiles();
                     } catch (IOException ioe) {
                         ioe.printStackTrace();

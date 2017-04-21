@@ -11,7 +11,7 @@ import java.util.Scanner;
  * This class will manage the thread pool via the executor class
  */
 public class ClientHandler implements Runnable {
-    private static int FILE_PORT = 4455;
+    private static int FILE_PORT = 8845;
     private Scanner reader = null;
     private PrintWriter writer = null;
 
@@ -51,13 +51,17 @@ public class ClientHandler implements Runnable {
 
 
     public void sendFile(String directory) {
-        String serverLocation = "/src/serverPublic/" + directory;
+        String serverLocation = ("src/serverPublic/" + directory);
+        System.out.println(serverLocation);
         try {
             ServerSocket serverSocket = new ServerSocket(FILE_PORT);
+            send("$DOWNLOAD$");
 
-            while (true) {
+//            while (true) {
                 Socket socket = serverSocket.accept();
+            System.out.println("Client Connected");
                 File[] files = new File(serverLocation).listFiles();
+            System.out.println(files.length);
                 BufferedOutputStream bos = new BufferedOutputStream(socket.getOutputStream());
                 DataOutputStream dos = new DataOutputStream(bos);
 
@@ -74,7 +78,7 @@ public class ClientHandler implements Runnable {
                     FileInputStream fis = new FileInputStream(file);
                     BufferedInputStream bis = new BufferedInputStream(fis);
 
-                    int fileByte = 0;
+                    int fileByte;
                     while ((fileByte = bis.read()) != -1) {
                         bos.write(fileByte);
                     }
@@ -83,7 +87,8 @@ public class ClientHandler implements Runnable {
                 }
                 dos.close();
                 serverSocket.close();
-            }
+            send("Done");
+//            }
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
@@ -101,7 +106,6 @@ public class ClientHandler implements Runnable {
                 String folder = reader.nextLine();
                 if (folderExists(folder)) {
                     sendFile(folder);
-                    send("$DOWNLOAD$");
                 }
                 else {
                     send("Folder Does Not Exist On The Server.");
