@@ -4,7 +4,9 @@ package networks.cw2;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
+import java.util.logging.Level;
 
 /**
  * Client Handler - Jacob Holland
@@ -12,13 +14,18 @@ import java.util.Scanner;
  */
 public class ClientHandler implements Runnable {
     private static int FILE_PORT = 8845;
+    public Log serverLog;
     private Scanner reader = null;
+    private String ClientIP;
     private PrintWriter writer = null;
 
     public ClientHandler(Socket client) {
         try {
+            ClientIP = client.getInetAddress().toString();
             reader = new Scanner(client.getInputStream());
             writer = new PrintWriter(client.getOutputStream(), true);
+            serverLog = new Log("log.txt");
+            serverLog.logger.setLevel(Level.ALL);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -98,22 +105,28 @@ public class ClientHandler implements Runnable {
     public void run() {
         //send("You have Connected.");
         String message;
-        while ((message = reader.nextLine()) != null) {
-            if (message.contains("$LIST$")) {
-                send(listDirectories());
-            }
-            if (message.contains("$DOWNLOAD$")) {
-                String folder = reader.nextLine();
-                if (folderExists(folder)) {
-                    sendFile(folder);
+        try {
+            while ((message = reader.nextLine()) != null) {
+                if (message.contains("$LIST$")) {
+                    send(listDirectories());
+                    serverLog.logger.info(this.ClientIP + " Requested serverPublic List");
                 }
-                else {
-                    send("Folder Does Not Exist On The Server.");
+                if (message.contains("$DOWNLOAD$")) {
+                    String folder = reader.nextLine();
+                    if (folderExists(folder)) {
+                        sendFile(folder);
+                        serverLog.logger.info(this.ClientIP + " Initiated Download Of: " + folder);
+                    } else {
+                        send("Folder Does Not Exist On The Server.");
+                    }
                 }
+                //System.out.println("Client Handler Read: " + message);
+                //setChanged();
+                //notifyObservers(message);
             }
-            //System.out.println("Client Handler Read: " + message);
-            //setChanged();
-            //notifyObservers(message);
+            reader.close();
+        } catch (NoSuchElementException e) {
+            reader.close();
         }
     }
 
