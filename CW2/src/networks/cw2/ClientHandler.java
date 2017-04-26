@@ -37,7 +37,7 @@ public class ClientHandler implements Runnable {
 
 
     public String listDirectories() {
-        File file = new File("src/serverPublic");
+        File file = new File("src/SerserverPublic");
         String[] directories = file.list(new FilenameFilter() {
             @Override
             public boolean accept(File current, String name) {
