@@ -13,6 +13,7 @@ public class Log {
     public Logger logger;
     FileHandler fh;
 
+    //Make a new file for logging which the server can write to
     public Log(String fileName) throws SecurityException, IOException {
         File f = new File(fileName);
         if (!f.exists()) {

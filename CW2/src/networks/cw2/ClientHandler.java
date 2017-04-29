@@ -36,8 +36,11 @@ public class ClientHandler implements Runnable {
     }
 
 
+    /*listDirectories - check ServerPublic folder and check if there are directories,
+    add it to an array. Print this array and return it to be used for printing
+     */
     public String listDirectories() {
-        File file = new File("src/SerserverPublic");
+        File file = new File("serverPublic");
         String[] directories = file.list(new FilenameFilter() {
             @Override
             public boolean accept(File current, String name) {
@@ -51,49 +54,57 @@ public class ClientHandler implements Runnable {
         return folderList;
     }
 
+    //Check if folder exists before opening a socket for file transfer
     public boolean folderExists(String folder){
-        boolean result = new File("src/serverPublic/" + folder).exists();
+        boolean result = new File("serverPublic/" + folder).exists();
         return result;
     }
 
 
+    /* Sendfile - create a new file server socket exclusively for file transfer
+    Send details of each file through DOS and then send file contents via packets
+     */
     public void sendFile(String directory) {
-        String serverLocation = ("src/serverPublic/" + directory);
+        String serverLocation = ("serverPublic/" + directory);
         System.out.println(serverLocation);
         try {
             ServerSocket serverSocket = new ServerSocket(FILE_PORT);
             send("$DOWNLOAD$");
 
 //            while (true) {
-                Socket socket = serverSocket.accept();
+            Socket socket = serverSocket.accept();
             System.out.println("Client Connected");
-                File[] files = new File(serverLocation).listFiles();
+            //Create an array of files to be sent and send size to client
+            File[] files = new File(serverLocation).listFiles();
             System.out.println(files.length);
-                BufferedOutputStream bos = new BufferedOutputStream(socket.getOutputStream());
-                DataOutputStream dos = new DataOutputStream(bos);
+            BufferedOutputStream bos = new BufferedOutputStream(socket.getOutputStream());
+            DataOutputStream dos = new DataOutputStream(bos);
 
-                dos.writeInt(files.length);
-                dos.writeUTF(directory);
+            dos.writeInt(files.length);
+            dos.writeUTF(directory);
 
-                for (File file : files) {
-                    long length = file.length();
-                    dos.writeLong(length);
+            //Send name of file to client for creation, and output the file contents
+            //To a buffer for easier receptiion
+            for (File file : files) {
+                long length = file.length();
+                dos.writeLong(length);
 
-                    String name = file.getName();
-                    dos.writeUTF(name);
+                String name = file.getName();
+                dos.writeUTF(name);
 
-                    FileInputStream fis = new FileInputStream(file);
-                    BufferedInputStream bis = new BufferedInputStream(fis);
+                FileInputStream fis = new FileInputStream(file);
+                BufferedInputStream bis = new BufferedInputStream(fis);
 
-                    int fileByte;
-                    while ((fileByte = bis.read()) != -1) {
-                        bos.write(fileByte);
-                    }
-
-                    bis.close();
+                int fileByte;
+                while ((fileByte = bis.read()) != -1) {
+                    bos.write(fileByte);
                 }
-                dos.close();
-                serverSocket.close();
+
+                bis.close();
+            }
+            //Close the socket once the transfer is done
+            dos.close();
+            serverSocket.close();
             send("Done");
 //            }
         } catch (IOException ioe) {
@@ -102,6 +113,7 @@ public class ClientHandler implements Runnable {
 
     }
 
+    //Reads commands been sent by the client application and executes the method to send back data to the client.
     public void run() {
         //send("You have Connected.");
         String message;

@@ -16,6 +16,7 @@ public class FileServer {
     private ServerSocket serverSocket;
     //private ArrayList<ClientHandler> clients = null;
 
+    //Create a new server socket for clients to connect to
     public FileServer(int port) {
         try {
             serverSocket = new ServerSocket(port);
@@ -32,9 +33,11 @@ public class FileServer {
         FileServer server = new FileServer(4444);
     }
 
+    //When each client connects, assign it a dedicated thread and CH for commands to be sent/received
     public class ServerLoop implements Runnable {
         public void run() {
             try {
+                //Allows for a maxiumum of 10 simulatenously connected clients
                 Executor service = Executors.newFixedThreadPool(10);
 
                 while (true) {
